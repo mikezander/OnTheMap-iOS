@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import SystemConfiguration
 
-class LogInVC: UIViewController{
+class LogInVC: UIViewController, UITextFieldDelegate{
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
@@ -21,6 +22,7 @@ class LogInVC: UIViewController{
         
         emailTextField.delegate = self
         passwordTextField.delegate = self
+  
         passwordTextField.isSecureTextEntry = true
     }
     
@@ -29,23 +31,33 @@ class LogInVC: UIViewController{
         
         emailTextField.text = ""
         passwordTextField.text = ""
+        
+        subscribeToKeyboardNotifications()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        unsubscribeToKeyboardNotifications()
     }
 
     @IBAction func loginPressed(_ sender: Any) {
  
         UdacityClient.sharedInstance().authenticateWithViewController(email: emailTextField.text!, password: passwordTextField.text!, hostViewController: self) {(success, error) in
-            performUIUpdatesOnMain {
+
+            if self.isInternetAvailable(){
+           
+                performUIUpdatesOnMain {
                 if success{
                     self.completeLogin()
                 }else{
-                    let alert = UIAlertController(title: "Login Failed", message: "Invalid username/password", preferredStyle: .alert)
-                    let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-                    
-                    alert.addAction(action)
-                    self.present(alert, animated: true, completion: nil)
+                    self.errorAlert(title: "Login Failed", message: "Invalid username/password"); return
                 }
             }
-            
+           
+            }else{
+                self.errorAlert(title: "Login Failed", message: "No network connection"); return
+            }
         }
     
     }
@@ -66,17 +78,94 @@ class LogInVC: UIViewController{
         }
     }
     
+    func isInternetAvailable() -> Bool {
+        
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        
+        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                SCNetworkReachabilityCreateWithAddress(nil, $0)
+            }
+        }) else {
+            return false
+        }
+        
+        var flags: SCNetworkReachabilityFlags = []
+        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
+            return false
+        }
+        
+        let isReachable = flags.contains(.reachable)
+        let needsConnection = flags.contains(.connectionRequired)
+        
+        return (isReachable && !needsConnection)
+    }
+    
+    func errorAlert(title:String, message:String){
+        performUIUpdatesOnMain {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+            
+            alert.addAction(action)
+            self.present(alert, animated: true, completion: nil)
+        }
+        
+    }   
 }
 
-extension LogInVC: UITextFieldDelegate{
+extension LogInVC{
     
+    
+    
+    // dismisses the keyboard when users hits return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
         return true
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+    //shifts the view up from bottom text field to be visible
+    func keyboardWillShow(notification: NSNotification){
+        
+        if passwordTextField.isFirstResponder || emailTextField.isFirstResponder{
+            view.frame.origin.y = -getKeyboardHeight(notification: notification)
+        }
+    }
+    
+    //shifts view down once done editing bottom text field
+    func keyboardWillHide(notification: NSNotification){
+        
+        if passwordTextField.isFirstResponder{
+            view.frame.origin.y = 0
+        }
+    }
+    
+    //helper function for keyboardWillShow
+    func getKeyboardHeight(notification: NSNotification) -> CGFloat{
+        let userInfo = notification.userInfo
+        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
+        return keyboardSize.cgRectValue.height
+    }
+    
+    
+    func subscribeToKeyboardNotifications(){
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+    }
+    
+    func unsubscribeToKeyboardNotifications(){
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+    }
+  
+   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
         
     }
     

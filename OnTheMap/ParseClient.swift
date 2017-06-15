@@ -13,9 +13,9 @@ class ParseClient: NSObject{
     
     static let sharedInstance = ParseClient()
     
-    var students = [Student]()
+    var students = [StudentInformation]()
     
-    func getStudents(completionHandlerForStudentList: @escaping (_ result: [Student]?, _ error: NSError?)-> Void){
+    func getStudents(completionHandlerForStudentList: @escaping (_ result: [StudentInformation]?, _ error: NSError?)-> Void){
         let request = NSMutableURLRequest(url: NSURL(string: "https://parse.udacity.com/parse/classes/StudentLocation?limit=100&order=-updatedAt")! as URL)
         request.addValue(ParseClient.Constants.parseApplicationId, forHTTPHeaderField: "X-Parse-Application-Id")
         request.addValue(ParseClient.Constants.parseRESTApiKey, forHTTPHeaderField: "X-Parse-REST-API-Key")
@@ -49,7 +49,7 @@ class ParseClient: NSObject{
                 return
             }
             
-           let students = Student.studentFromResult(results: resultArray)
+           let students = StudentInformation.studentFromResult(results: resultArray)
             
                 completionHandlerForStudentList(students, nil)
           
