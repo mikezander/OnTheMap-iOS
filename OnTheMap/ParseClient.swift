@@ -21,7 +21,7 @@ class ParseClient: NSObject{
         request.addValue(ParseClient.Constants.parseRESTApiKey, forHTTPHeaderField: "X-Parse-REST-API-Key")
         let session = URLSession.shared
         let task = session.dataTask(with: request as URLRequest) { data, response, error in
-            if error != nil { // Handle error...
+           guard(error == nil) else { 
                 completionHandlerForStudentList(nil, error as NSError?)
                 return
             }

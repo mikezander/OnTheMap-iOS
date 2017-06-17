@@ -24,11 +24,10 @@ class StudentTableVC: UITableViewController{
     
         ParseClient.sharedInstance.students = result!
             
-            performUIUpdatesOnMain {
+            self.performUIUpdatesOnMain {
                 self.studentTableView.reloadData()
             }
-            
-           
+  
         }
     }
     
@@ -44,7 +43,7 @@ class StudentTableVC: UITableViewController{
                 print("logout failed")
                 return
             }
-            performUIUpdatesOnMain {
+            self.performUIUpdatesOnMain {
                 self.dismiss(animated: true, completion: nil)
             }
             
@@ -72,14 +71,8 @@ class StudentTableVC: UITableViewController{
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         guard let mediaURL = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text else{
-            performUIUpdatesOnMain {
-                let alertController = UIAlertController(title: "Error", message: "Invalid Link", preferredStyle: .alert)
-                let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-                alertController.addAction(action)
-                self.present(alertController, animated: true, completion: nil)
-            }
-            return
-        }
+            
+            performUIUpdatesOnMain {self.errorAlert(title: "Error", message: "Invalid link")};return}
         
         if let refrenceURL = NSURL(string: mediaURL){
             if #available(iOS 10, *) {
@@ -89,14 +82,8 @@ class StudentTableVC: UITableViewController{
             }
             
         }else{
-            performUIUpdatesOnMain {
-                let alert = UIAlertController(title: "Error", message: "Unable to open media url", preferredStyle: .alert)
-                let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-                alert.addAction(action)
-                self.present(alert, animated: true, completion: nil)
-            }
-            
-                
+            performUIUpdatesOnMain { self.errorAlert(title: "Error", message: "Unable to open media link" )}
+      
             }
     
     }

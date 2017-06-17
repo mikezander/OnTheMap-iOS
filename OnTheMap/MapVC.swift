@@ -14,13 +14,6 @@ class MapVC: UIViewController, MKMapViewDelegate{
     
     @IBOutlet weak var mapView: MKMapView!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        mapView.delegate = self
-
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
        
@@ -45,7 +38,7 @@ class MapVC: UIViewController, MKMapViewDelegate{
 
                  ParseClient.sharedInstance.students = result!
 
-            performUIUpdatesOnMain {
+            self.performUIUpdatesOnMain {
                 self.mapView.addAnnotations(self.populateMap())
             }
             
@@ -102,7 +95,7 @@ class MapVC: UIViewController, MKMapViewDelegate{
         
             guard success && error == nil else{ self.errorAlert(title: "Error", message: "Logout failed"); return}
             
-            performUIUpdatesOnMain {
+            self.performUIUpdatesOnMain {
                 self.dismiss(animated: true, completion: nil)
             }
             
@@ -153,14 +146,5 @@ class MapVC: UIViewController, MKMapViewDelegate{
             }
         }
     }
-    func errorAlert(title:String, message:String){
-        performUIUpdatesOnMain {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-            
-            alert.addAction(action)
-            self.present(alert, animated: true, completion: nil)
-        }
-   
-    }
+    
 }

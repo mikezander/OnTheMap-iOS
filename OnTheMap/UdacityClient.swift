@@ -5,25 +5,19 @@
 //  Created by Michael Alexander on 6/8/17.
 //  Copyright © 2017 Michael Alexander. All rights reserved.
 //
-
 import Foundation
 import UIKit
 
-class UdacityClient: NSObject{
-
+class UdacityClient{
+    
     // MARK: Properties
     
     // shared session
     var session = URLSession.shared
-  
-    // MARK: Initializers
+ 
     
-    override init() {
-        super.init()
-    }
-
     func authenticateWithViewController(email: String, password: String, hostViewController: UIViewController, completionHandlerForAuth: @escaping (_ success: Bool, _ errorString: String?) -> Void){
-    
+        
         getCredentials(email: email, password: password) { (success, accountKey, sessionId, errorString) in
             
             if success {
@@ -33,13 +27,13 @@ class UdacityClient: NSObject{
                 User.sharedInstance.sessionID = sessionId
                 
                 completionHandlerForAuth(true, nil)
-     
+                
             } else {
                 
                 completionHandlerForAuth(false, errorString)
             }
         }
-    
+        
     } // end authenticateWithViewController
     
     private func getCredentials(email: String, password: String, completionHandlerForGetCredentials: @escaping (_ success: Bool, _ accountKey: String?, _ sessionId: String?, _ errorString: String?) -> Void) {
@@ -53,7 +47,7 @@ class UdacityClient: NSObject{
         
         //Make the request
         let task = session.dataTask(with: request as URLRequest) { data, response, error in
-           
+            
             func sendError(_ error: String){
                 print(error)
                 completionHandlerForGetCredentials(false, nil, nil, error)
@@ -76,7 +70,7 @@ class UdacityClient: NSObject{
                 sendError("No data was returned by the request!")
                 return
             }
-
+            
             let range = Range(5..<data.count) //deleted unwrap double check**
             let newData = data.subdata(in: range) /* subset response data! */
             print(NSString(data: newData, encoding: String.Encoding.utf8.rawValue)!)
@@ -85,7 +79,7 @@ class UdacityClient: NSObject{
             var parsedResults: AnyObject! = nil
             
             do{
-            parsedResults = try JSONSerialization.jsonObject(with: newData, options: .allowFragments) as AnyObject
+                parsedResults = try JSONSerialization.jsonObject(with: newData, options: .allowFragments) as AnyObject
                 print(parsedResults)
             }catch{
                 print("error parsing JSON \(LocalizedError.self)")
@@ -93,20 +87,20 @@ class UdacityClient: NSObject{
             
             if let accountDicitionary = parsedResults["account"] as? [String:AnyObject],
                 let sessionDictinary = parsedResults["session"] as? [String:AnyObject]{
-            
+                
                 let key = accountDicitionary["key"] as! String?
                 let id = sessionDictinary["id"] as! String?
                 
                 completionHandlerForGetCredentials(true, key, id, nil)
             }
         }
-       
+        
         //Start the request
         task.resume()
     }
     
     func logOutSession(completionHandlerForLogout:@escaping (_ success: Bool, _ error: Error?)-> Void){
-    
+        
         let request = NSMutableURLRequest(url: URL(string: "https://www.udacity.com/api/session")!)
         request.httpMethod = "DELETE"
         var xsrfCookie: HTTPCookie? = nil
@@ -127,15 +121,15 @@ class UdacityClient: NSObject{
                 return
             }
             
-        let range = Range(5..<data!.count)
-        let newData = data?.subdata(in: range) /* subset response data! */
-        print(NSString(data: newData!, encoding: String.Encoding.utf8.rawValue)!)
-        
+            let range = Range(5..<data!.count)
+            let newData = data?.subdata(in: range) /* subset response data! */
+            print(NSString(data: newData!, encoding: String.Encoding.utf8.rawValue)!)
+            
             completionHandlerForLogout(true,nil)
         }
         
         task.resume()
-    
+        
     }
     
     class func sharedInstance() -> UdacityClient {
@@ -144,5 +138,5 @@ class UdacityClient: NSObject{
         }
         return Singleton.sharedInstance
     }
-
+    
 }

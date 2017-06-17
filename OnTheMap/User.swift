@@ -6,15 +6,14 @@
 //  Copyright © 2017 Michael Alexander. All rights reserved.
 //
 
-import Foundation
-
 class User {
-
+    
     var sessionID: String? = nil
     var uniqueKey: String? = nil
     var firstName: String? = nil
     var lastName: String? = nil
-
+    
     static let sharedInstance = User()
-  
+    
 }
+

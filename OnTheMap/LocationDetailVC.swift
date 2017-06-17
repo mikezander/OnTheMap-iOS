@@ -28,6 +28,8 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
     
     let whereString = "Where are you\r studying\r today?" as NSString
     
+    var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -54,6 +56,16 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
   
     @IBAction func findOnMapPressed(_ sender: Any) {
         
+        performUIUpdatesOnMain {
+            
+            self.activityIndicator.center = self.view.center
+            self.activityIndicator.hidesWhenStopped = true
+            self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+            self.view.addSubview(self.activityIndicator)
+            
+            self.activityIndicator.startAnimating()
+        }
+        
         let localSearchRequest = MKLocalSearchRequest()
         localSearchRequest.naturalLanguageQuery = locationTextField.text
         let localSearch = MKLocalSearch(request: localSearchRequest)
@@ -74,7 +86,7 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
         self.mapView.region = MKCoordinateRegionMakeWithDistance(self.pointAnnotation.coordinate, 5000, 5000)
        
             
-            performUIUpdatesOnMain {
+            self.performUIUpdatesOnMain {
                 
                 //hide top view
                 self.secondView.isHidden = true
@@ -91,6 +103,7 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
                 let postLocationButton = self.configButton()
                 postLocationButton.addTarget(self, action:#selector(self.postLocationPressed), for: .touchUpInside)
                 self.view.addSubview(postLocationButton)
+                self.activityIndicator.stopAnimating()
             }
     
         })//end completion handler
@@ -138,17 +151,8 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
         
         return attributedString
     }
+   
     
-    func errorAlert(title:String, message:String){
-        performUIUpdatesOnMain {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-            
-            alert.addAction(action)
-            self.present(alert, animated: true, completion: nil)
-        }
-        
-    }
 }
 
 extension LocationDetailVC: UITextFieldDelegate{

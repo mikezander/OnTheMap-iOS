@@ -47,7 +47,7 @@ class LogInVC: UIViewController, UITextFieldDelegate{
 
             if self.isInternetAvailable(){
            
-                performUIUpdatesOnMain {
+                self.performUIUpdatesOnMain {
                 if success{
                     self.completeLogin()
                 }else{
@@ -103,16 +103,6 @@ class LogInVC: UIViewController, UITextFieldDelegate{
         return (isReachable && !needsConnection)
     }
     
-    func errorAlert(title:String, message:String){
-        performUIUpdatesOnMain {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-            
-            alert.addAction(action)
-            self.present(alert, animated: true, completion: nil)
-        }
-        
-    }   
 }
 
 extension LogInVC{
