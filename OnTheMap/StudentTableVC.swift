@@ -12,7 +12,7 @@ class StudentTableVC: UITableViewController{
 
     @IBOutlet var studentTableView: UITableView!
     
-    var studentURL: String?
+    var studentURL: [String]?
 
     func getStudentList(){
         
@@ -22,7 +22,7 @@ class StudentTableVC: UITableViewController{
                 return
             }
     
-           ParseClient.sharedInstance.students = result!
+        ParseClient.sharedInstance.students = result!
             
             performUIUpdatesOnMain {
                 self.studentTableView.reloadData()
@@ -33,10 +33,11 @@ class StudentTableVC: UITableViewController{
     }
     
     @IBAction func refreshPressed(_ sender: Any) {
-            getStudentList()
+        getStudentList()
     }
     
     @IBAction func logoutPressed(_ sender: Any) {
+        
         UdacityClient.sharedInstance().logOutSession(completionHandlerForLogout: {(success, error) in
             
             guard success && error == nil else{
@@ -61,13 +62,16 @@ class StudentTableVC: UITableViewController{
         
         cell.imageView?.image = UIImage(named: "pin")
         cell.textLabel?.text = student.firstName + " " + student.lastName
-        studentURL = student.mediaURL
+        cell.detailTextLabel?.text = student.mediaURL
+        cell.detailTextLabel?.textColor = UIColor.white
+        
 
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let mediaURL = studentURL else{
+        
+        guard let mediaURL = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text else{
             performUIUpdatesOnMain {
                 let alertController = UIAlertController(title: "Error", message: "Invalid Link", preferredStyle: .alert)
                 let action = UIAlertAction(title: "OK", style: .default, handler: nil)

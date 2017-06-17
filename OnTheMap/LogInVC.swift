@@ -63,7 +63,7 @@ class LogInVC: UIViewController, UITextFieldDelegate{
     }
     
     private func completeLogin(){
-    let vc = storyboard!.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
+        let vc = storyboard!.instantiateViewController(withIdentifier: "tabBarController") as! UITabBarController
         present(vc, animated: true, completion: nil)
     }
     
@@ -116,9 +116,7 @@ class LogInVC: UIViewController, UITextFieldDelegate{
 }
 
 extension LogInVC{
-    
-    
-    
+
     // dismisses the keyboard when users hits return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -126,18 +124,16 @@ extension LogInVC{
         return true
     }
     
-    //shifts the view up from bottom text field to be visible
+    //shifts the view up from text field to be visible
     func keyboardWillShow(notification: NSNotification){
-        
         if passwordTextField.isFirstResponder || emailTextField.isFirstResponder{
-            view.frame.origin.y = -getKeyboardHeight(notification: notification)
+            view.frame.origin.y = (-getKeyboardHeight(notification: notification) / 2)
         }
     }
     
-    //shifts view down once done editing bottom text field
+    //shifts view down once done editing text field
     func keyboardWillHide(notification: NSNotification){
-        
-        if passwordTextField.isFirstResponder{
+        if passwordTextField.isFirstResponder || emailTextField.isFirstResponder{
             view.frame.origin.y = 0
         }
     }
