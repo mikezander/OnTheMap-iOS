@@ -29,7 +29,7 @@ class MapVC: UIViewController, MKMapViewDelegate{
     }
     
     func getStudentList(){
-    
+        
         ParseClient.sharedInstance.getStudents {(result,error) in
         
             guard (error == nil) else { self.errorAlert(title: "Error", message: "Unable to retrieve list of students"); return}
@@ -40,6 +40,7 @@ class MapVC: UIViewController, MKMapViewDelegate{
 
             self.performUIUpdatesOnMain {
                 self.mapView.addAnnotations(self.populateMap())
+                //mapView.removeAnnotations(mapView.annotations)
             }
             
         } //end completion handler

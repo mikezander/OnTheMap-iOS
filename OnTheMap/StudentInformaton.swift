@@ -24,8 +24,8 @@ struct StudentInformation{
 
     init(dictionary: [String:AnyObject]){
 
-        firstName = dictionary["firstName"] as? String ?? ""
-        lastName = dictionary["lastName"] as? String ?? ""
+        firstName = dictionary["firstName"] as? String ?? "firstName"
+        lastName = dictionary["lastName"] as? String ?? "lastName"
         latitude = dictionary["latitude"] as? Float ?? 0.0
         longitude = dictionary["longitude"] as? Float ?? 0.0
         mapString = dictionary["mapString"] as? String ?? ""

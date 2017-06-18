@@ -18,7 +18,7 @@ class StudentTableVC: UITableViewController{
         
         ParseClient.sharedInstance.getStudents { (result, error) in
             guard (result != nil || error == nil) else {
-                print("Unable to get student list")
+                self.errorAlert(title: "Error", message: "Unable to get student list")
                 return
             }
     
@@ -40,7 +40,7 @@ class StudentTableVC: UITableViewController{
         UdacityClient.sharedInstance().logOutSession(completionHandlerForLogout: {(success, error) in
             
             guard success && error == nil else{
-                print("logout failed")
+                self.errorAlert(title: "Error", message: "Unable to get student list")
                 return
             }
             self.performUIUpdatesOnMain {
@@ -69,7 +69,7 @@ class StudentTableVC: UITableViewController{
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        tableView.deselectRow(at: indexPath, animated: true)
         guard let mediaURL = tableView.cellForRow(at: indexPath)?.detailTextLabel?.text else{
             
             performUIUpdatesOnMain {self.errorAlert(title: "Error", message: "Invalid link")};return}

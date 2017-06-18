@@ -70,9 +70,17 @@ class LocationDetailVC: UIViewController, MKMapViewDelegate{
         localSearchRequest.naturalLanguageQuery = locationTextField.text
         let localSearch = MKLocalSearch(request: localSearchRequest)
         localSearch.start(completionHandler: {(localSearchResponse, error) in
-            guard(error == nil) else{ self.errorAlert(title: "Error", message: "Unable to retrieve location"); return}
+            guard(error == nil) else{
+                self.errorAlert(title: "Error", message: "Unable to retrieve location")
+                self.performUIUpdatesOnMain { self.activityIndicator.stopAnimating()}
+                return
+            }
             
-            guard(localSearchResponse != nil) else{ self.errorAlert(title: "Error", message: "Unable to retrieve location"); return}
+            guard(localSearchResponse != nil) else{
+                self.errorAlert(title: "Error", message: "Unable to retrieve location")
+                self.performUIUpdatesOnMain { self.activityIndicator.stopAnimating()}
+                return
+            }
             
         self.mapString = self.locationTextField.text
             
