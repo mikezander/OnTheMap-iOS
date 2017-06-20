@@ -62,9 +62,7 @@ class StudentTableVC: UITableViewController{
         cell.imageView?.image = UIImage(named: "pin")
         cell.textLabel?.text = student.firstName + " " + student.lastName
         cell.detailTextLabel?.text = student.mediaURL
-        cell.detailTextLabel?.textColor = UIColor.white
-        
-
+      
         return cell
     }
     
